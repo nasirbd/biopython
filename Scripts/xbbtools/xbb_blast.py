@@ -16,7 +16,8 @@ try:
 except ImportError:
     from tkinter import *  # Python 3
 
-import Pmw
+#import Pmw
+import ttk
 sys.path.insert(0, '.')
 
 from xbb_utils import NotePad
@@ -28,14 +29,15 @@ class BlastIt(object):
         self.seq = seq
         self.parent = parent
         self.toplevel = Toplevel(parent)
-        Pmw.initialise(parent)
+        # Pmw.initialise(parent)
         self.GetBlasts()
         self.Choices()
 
     def GetBlasts(self):
         pin, nin = [], []
         try:
-            pin.extend(glob.glob(os.environ['BLASTDB'] + '/*.pin'))
+            #pin.extend(glob.glob(os.environ['BLASTDB'] + '/*.pin'))
+            pin.extend(glob.glob('c:/*/*.pin'))
         except:
             pass
         pin.extend(glob.glob('*.pin'))
@@ -50,15 +52,26 @@ class BlastIt(object):
         self.nin = [os.path.splitext(x)[0] for x in nin]
 
     def Choices(self):
+        self.blast_string = StringVar()
+        self.blast_string.set('blastn')
         self.GetBlasts()
         self.cf = Frame(self.toplevel)
         self.cf.pack(side=TOP, expand=1, fill=X)
+        self.dbs = ttk.Combobox(self.cf, exportselection=0,
+                                values=self.nin + self.pin)
+        '''
         self.dbs = Pmw.ComboBox(self.cf,
                                 label_text='Blast Databases:',
                                 labelpos='nw',
                                 scrolledlist_items=self.nin + self.pin,
                                 selectioncommand=self.Validate
                                 )
+        '''
+        self.blasts = ttk.Combobox(self.cf, exportselection=0,
+                                   textvariable=self.blast_string,
+                                   values=['blastn', 'blastp', 'blastx',
+                                           'tblastn', 'tblastx'])
+        '''
         self.blasts = Pmw.ComboBox(self.cf,
                                    label_text='Blast Programs:',
                                    labelpos='nw',
@@ -67,6 +80,7 @@ class BlastIt(object):
                                                        'tblastx'],
                                    selectioncommand=self.Validate
                                    )
+        '''
         self.dbs.pack(side=LEFT, expand=1, fill=X)
         self.blasts.pack(side=LEFT, expand=1, fill=X)
 
@@ -78,8 +92,8 @@ class BlastIt(object):
                          command=self._Run)
         self.ok.pack(side=RIGHT)
 
-        self.dbs.selectitem(0)
-        self.blasts.selectitem(0)
+        #self.dbs.selectitem(0)
+        #self.blasts.selectitem(0)
         self.Validate()
 
     def Validate(self, *args):
@@ -91,8 +105,10 @@ class BlastIt(object):
         elif (prog in ['blastp', 'blastx']) == (db in self.pin):
             color = 'green'
 
-        self.dbs.component('entry').configure(bg=color)
-        self.blasts.component('entry').configure(bg=color)
+        #self.dbs.component('entry').configure(bg=color)
+        #self.blasts.component('entry').configure(bg=color)
+        self.dbs.config(background=color)
+        self.blasts.config(background=color)
 
     def _Run(self):
         alternative_command = self.alternative.get()
