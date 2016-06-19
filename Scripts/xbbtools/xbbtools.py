@@ -14,13 +14,13 @@ import sys
 sys.path.insert(0, '.')
 
 try:
-    from Tkinter import *  # Python 2
+    import Tkinter as tk  # Python 2
 except ImportError:
-    from tkinter import *  # Python 3
+    import tkinter as tk  # Python 3
 
 from xbb_widget import xbb_widget
 
-win = Tk()
+win = tk.Tk()
 xbbtools = xbb_widget()
 xbbtools.main_frame.option_add('*frame.background', 'dimgrey')
 

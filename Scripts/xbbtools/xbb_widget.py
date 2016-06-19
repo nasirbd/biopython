@@ -166,7 +166,8 @@ class xbb_widget(object):
         self.translation_menu.add_cascade(label="Genetic Codes",
                                           menu=self.gencode_menu)
 
-        self.menubar.add_cascade(label="Translations", menu=self.translation_menu)
+        self.menubar.add_cascade(label="Translations",
+                                 menu=self.translation_menu)
 
         # Tools menu
         self.tools_menu = Menu(self.menubar)
@@ -283,7 +284,7 @@ class xbb_widget(object):
         if not len(seq):
             seq = self.sequence_id.get(1.0, END)
 
-        seq = re.sub('[^A-Z]', '', seq)
+        seq = str(re.sub('[^A-Z]', '', seq))
         return seq
 
     def get_selection(self):
@@ -349,7 +350,7 @@ class xbb_widget(object):
         self.update_label(name)
 
     def fix_sequence(self):
-        seq = self.sequence_id.get(1.0, END)
+        seq = str(self.sequence_id.get(1.0, END))
         seq = seq.upper()
         seq = re.sub('[^A-Z]', '', seq)
         self.sequence_id.delete(0.0, END)
@@ -370,7 +371,8 @@ class xbb_widget(object):
             return
         np = NotePad()
         tid = np.text_id()
-        tid.insert(END, self.translator.gcframe(seq, self.current_codon_table_id))
+        tid.insert(END, self.translator.gcframe(seq,
+                                                self.current_codon_table_id))
 
     def translate(self, frame=1):
         seq = self.get_selection_or_sequence()
@@ -444,10 +446,12 @@ class xbb_widget(object):
         except Exception:  # Which exceptions?
             start, stop = 1.0, self.sequence_id.index(END)
 
-        seq = w.get(start, stop)
+        seq = str(w.get(start, stop))
+        
         seq = re.sub('[^A-Z]', '', seq)
 
         # print('seq >%s<' % seq)
+
         complementary = self.translator.complement(seq)
         w.delete(start, stop)
         w.insert(start, complementary)
@@ -463,7 +467,7 @@ class xbb_widget(object):
         except Exception:  # TODO - Which exceptions?
             start, stop = 1.0, self.sequence_id.index(END)
 
-        seq = w.get(start, stop)
+        seq = str(w.get(start, stop))
         seq = re.sub('[^A-Z]', '', seq)
 
         antip = self.translator.antiparallel(seq)
