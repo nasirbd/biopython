@@ -16,9 +16,11 @@ import sys
 import time
 
 try:
-    from Tkinter import *  # Python 2
+    import Tkinter as tk  # Python 2
+    import ttk
 except ImportError:
-    from tkinter import *  # Python 3
+    import tkinter as tk  # Python 3
+    import tkinter.ttk as ttk
 
 try:
     import tkFileDialog as filedialog  # Python 2
@@ -39,26 +41,27 @@ class xbb_widget(object):
     def __init__(self, parent=None):
         self.is_a_master = (parent is None)
         self.parent = parent
-
+        
         self.init_variables()
         self.init_colors()
         # master frame
-        self.main_frame = Frame(parent)
+        self.main_frame = ttk.Frame(parent)
         if not parent:
-            self.init_optionsdb()
+            #self.init_optionsdb()
             self.parent = self.main_frame.master
+            self.parent.option_add('*tearOff', 0)
 
         self.main_frame.pack(fill=BOTH, expand=1)
 
         # sequence info (GC%, positins etc.)
-        self.info_frame = Frame(self.main_frame)
+        self.info_frame = ttk.Frame(self.main_frame)
         self.info_frame.pack(fill=BOTH, expand=1)
 
         self.create_menu(self.info_frame)
         self.create_seqinfo(self.info_frame)
 
         # sequence field and fast buttons
-        self.seq_frame = Frame(self.main_frame)
+        self.seq_frame = ttk.Frame(self.main_frame)
         self.seq_frame.pack(fill=BOTH, expand=1)
 
         self.create_buttons(self.seq_frame)
@@ -123,16 +126,16 @@ class xbb_widget(object):
             tk.option_add(name, v)
 
     def create_menu(self, parent):
-        self.menubar = Menu(self.main_frame)
+        self.menubar = tk.Menu(self.main_frame)
 
         # File menu
-        self.file_menu = Menu(self.menubar)
+        self.file_menu = tk.Menu(self.menubar)
         menu = self.file_menu
         menu.add_command(label='Exit', command=self.exit)
         self.menubar.add_cascade(label="File", menu=self.file_menu)
 
         # Edit menu
-        self.edit_menu = Menu(self.menubar)
+        self.edit_menu = tk.Menu(self.menubar)
         menu = self.edit_menu
         menu.add_command(label='Complement', command=self.complement)
         menu.add_command(label='Antiparallel', command=self.antiparallel)
@@ -142,13 +145,13 @@ class xbb_widget(object):
         self.menubar.add_cascade(label="Edit", menu=self.edit_menu)
 
         # Translation menu
-        self.translation_menu = Menu(self.menubar)
+        self.translation_menu = tk.Menu(self.menubar)
         menu = self.translation_menu
         menu.add_command(label='+1 Frame', command=self.translate)
         menu.add_command(label='6 Frames', command=self.gcframe)
         menu.add_command(label='Extract to FASTA', command=self.extract)
 
-        self.current_codon_table = StringVar()
+        self.current_codon_table = tk.StringVar()
         self.current_codon_table.set('Standard')
         self.current_codon_table_id = 1
 
@@ -157,7 +160,7 @@ class xbb_widget(object):
         keys.sort()
         keys = ['Standard'] + keys
 
-        self.gencode_menu = Menu(self.translation_menu)
+        self.gencode_menu = tk.Menu(self.translation_menu)
         menu = self.gencode_menu
         for table in keys:
             menu.add_radiobutton(label=table,
@@ -170,14 +173,14 @@ class xbb_widget(object):
                                  menu=self.translation_menu)
 
         # Tools menu
-        self.tools_menu = Menu(self.menubar)
+        self.tools_menu = tk.Menu(self.menubar)
         menu = self.tools_menu
         menu.add_command(label='Blast', command=self.blast)
         menu.add_command(label='Stats', command=self.statistics)
         self.menubar.add_cascade(label="Tools", menu=self.tools_menu)
 
         # Help menu
-        self.help_menu = Menu(self.menubar, name='help')
+        self.help_menu = tk.Menu(self.menubar, name='help')
         menu = self.help_menu
         menu.add_command(label='Help', command=xbbtools_help)
         self.menubar.add_cascade(label="Help", menu=self.help_menu)
@@ -197,33 +200,33 @@ class xbb_widget(object):
 
     def create_seqinfo(self, parent):
         # all the sequence information in the top labels
-        self.seq_info1 = Frame(parent, relief=RIDGE,
-                               borderwidth=5, height=30)
+        self.seq_info1 = ttk.Frame(parent, relief=RIDGE,
+                                   borderwidth=5, height=30)
         self.seq_info1.pack(fill=BOTH, expand=1, side=TOP)
 
         self.position_ids = {}
         d = self.position_ids
-        d['id'] = Label(self.seq_info1, width=10)
-        d['from_id'] = Label(self.seq_info1, width=10)
-        d['to_id'] = Label(self.seq_info1, width=10)
-        d['length_id'] = Label(self.seq_info1, width=10)
-        d['label'] = Label(self.seq_info1, width=10)
+        d['id'] = ttk.Label(self.seq_info1, width=10)
+        d['from_id'] = ttk.Label(self.seq_info1, width=10)
+        d['to_id'] = ttk.Label(self.seq_info1, width=10)
+        d['length_id'] = ttk.Label(self.seq_info1, width=10)
+        d['label'] = ttk.Label(self.seq_info1, width=10)
         for i in ['id', 'from_id', 'to_id', 'length_id', 'label']:
             d[i].pack(side=LEFT, fill=BOTH, expand=1)
 
-        self.seq_info2 = Frame(parent, relief=RIDGE,
-                               borderwidth=5, height=30)
+        self.seq_info2 = ttk.Frame(parent, relief=RIDGE,
+                                   borderwidth=5, height=30)
         self.seq_info2.pack(fill=BOTH, expand=1, side=TOP)
         self.statistics_ids = {}
         d = self.statistics_ids
-        d['length_id'] = Label(self.seq_info2, width=10)
+        d['length_id'] = ttk.Label(self.seq_info2, width=10)
         d['length_id'].pack(side=LEFT, fill=BOTH, expand=1)
         for nt in ['A', 'C', 'G', 'T']:
-            d[nt] = Label(self.seq_info2, width=10, fg=self.colorsNT[nt])
+            d[nt] = ttk.Label(self.seq_info2, width=10)#, fg=self.colorsNT[nt])
             d[nt].pack(side=LEFT, fill=BOTH, expand=1)
 
     def create_buttons(self, parent):
-        self.button_frame = Frame(parent)
+        self.button_frame = ttk.Frame(parent)
         self.button_frame.pack(fill=Y, side=LEFT)
         self.buttons = {}
         for text, func in [('Open', self.open),
@@ -231,23 +234,24 @@ class xbb_widget(object):
                            ('GC Frame', self.gcframe),
                            ('Blast', self.blast),
                            ('Exit', self.exit)]:
-            b_id = Button(self.button_frame, text=text,
-                          command=func, width=7)
+            b_id = ttk.Button(self.button_frame, text=text,
+                              command=func, width=7)
             b_id.pack(side=TOP, pady=5, padx=10)
             self.buttons[text] = b_id
 
-        f = Frame(self.button_frame)
-        l = Label(f, text='Goto:', bg=self.colorsbg['frame'], fg=self.colorsfg['button'])
+        f = ttk.Frame(self.button_frame)
+        l = ttk.Label(f, text='Goto:') #, bg=self.colorsbg['frame'],
+                      #fg=self.colorsfg['button'])
         l.pack(side=LEFT)
         l.bind('<Button-1>', self.goto)
 
-        self.goto_entry = Entry(f, width=5)
+        self.goto_entry = ttk.Entry(f, width=5)
         self.goto_entry.pack(side=RIGHT, pady=5, padx=4)
         self.goto_entry.bind('<Return>', self.goto)
         f.pack(side=BOTTOM)
 
     def create_seqfield(self, parent):
-        self.sequence_id = Text(parent, wrap='char',
+        self.sequence_id = tk.Text(parent, wrap='char',
                                 width=self.seqwidth)
         self.sequence_id.pack(fill=BOTH, expand=1, side=RIGHT)
 
@@ -284,7 +288,7 @@ class xbb_widget(object):
         if not len(seq):
             seq = self.sequence_id.get(1.0, END)
 
-        seq = str(re.sub('[^A-Z]', '', seq))
+        seq = re.sub('[^A-Z]', '', seq)
         return seq
 
     def get_selection(self):
@@ -292,7 +296,7 @@ class xbb_widget(object):
         # print(w.selection_own())
         # w.selection_own()
         try:
-            return w.selection_get()
+            return str(w.selection_get())
             # return string.upper(w.get(sel.first, sel.last))
         except Exception:  # TODO - Which exceptions?
             return ''
@@ -411,9 +415,11 @@ class xbb_widget(object):
         np = NotePad()
         tid = np.text_id()
 
-        tid.insert(END, "%s\n\nLength = %d\nA=%d C=%d G=%d T=%d other=%d\nGC=%f\n\n" %
-                   (time.strftime('%y %b %d, %X\n', time.localtime(time.time())),
-                    len(seq), aa['A'], aa['C'], aa['G'], aa['T'], aa['N'], GC))
+        tid.insert(END, "%s\n\n" %
+                   (time.strftime('%y %b %d, %X\n',
+                                  time.localtime(time.time()))) + 
+                   "Length = %d\nA=%d C=%d G=%d T=%d other=%d\nGC=%f\n\n" %
+                   (len(seq), aa['A'], aa['C'], aa['G'], aa['T'], aa['N'], GC))
 
     def blast(self):
         seq = self.get_selection_or_sequence()
