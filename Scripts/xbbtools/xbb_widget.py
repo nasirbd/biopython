@@ -15,11 +15,11 @@ import re
 import sys
 import time
 
-try:
-    import Tkinter as tk  # Python 2
+try:  # Python 2
+    import Tkinter as tk
     import ttk
-except ImportError:
-    import tkinter as tk  # Python 3
+except ImportError:  # Python 3
+    import tkinter as tk
     import tkinter.ttk as ttk
 
 try:
@@ -51,18 +51,18 @@ class xbb_widget(object):
             self.parent = self.main_frame.master
             self.parent.option_add('*tearOff', 0)
 
-        self.main_frame.pack(fill=BOTH, expand=1)
+        self.main_frame.pack(fill=tk.BOTH, expand=1)
 
         # sequence info (GC%, positins etc.)
         self.info_frame = ttk.Frame(self.main_frame)
-        self.info_frame.pack(fill=BOTH, expand=1)
+        self.info_frame.pack(fill=tk.BOTH, expand=1)
 
         self.create_menu(self.info_frame)
         self.create_seqinfo(self.info_frame)
 
         # sequence field and fast buttons
         self.seq_frame = ttk.Frame(self.main_frame)
-        self.seq_frame.pack(fill=BOTH, expand=1)
+        self.seq_frame.pack(fill=tk.BOTH, expand=1)
 
         self.create_buttons(self.seq_frame)
         self.create_seqfield(self.seq_frame)
@@ -194,15 +194,17 @@ class xbb_widget(object):
     def exit(self, *args):
         # depending on if this widget is the first created or a child widget
         if self.is_a_master:
+            print('Self is a master')
             sys.exit(0)
         else:
+            print('Self is no master! What to do?')
             self.main_frame.destroy()
 
     def create_seqinfo(self, parent):
         # all the sequence information in the top labels
-        self.seq_info1 = ttk.Frame(parent, relief=RIDGE,
+        self.seq_info1 = ttk.Frame(parent, relief=tk.RIDGE,
                                    borderwidth=5, height=30)
-        self.seq_info1.pack(fill=BOTH, expand=1, side=TOP)
+        self.seq_info1.pack(fill=tk.BOTH, expand=1, side=tk.TOP)
 
         self.position_ids = {}
         d = self.position_ids
@@ -212,22 +214,22 @@ class xbb_widget(object):
         d['length_id'] = ttk.Label(self.seq_info1, width=10)
         d['label'] = ttk.Label(self.seq_info1, width=10)
         for i in ['id', 'from_id', 'to_id', 'length_id', 'label']:
-            d[i].pack(side=LEFT, fill=BOTH, expand=1)
+            d[i].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
-        self.seq_info2 = ttk.Frame(parent, relief=RIDGE,
+        self.seq_info2 = ttk.Frame(parent, relief=tk.RIDGE,
                                    borderwidth=5, height=30)
-        self.seq_info2.pack(fill=BOTH, expand=1, side=TOP)
+        self.seq_info2.pack(fill=tk.BOTH, expand=1, side=tk.TOP)
         self.statistics_ids = {}
         d = self.statistics_ids
         d['length_id'] = ttk.Label(self.seq_info2, width=10)
-        d['length_id'].pack(side=LEFT, fill=BOTH, expand=1)
+        d['length_id'].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         for nt in ['A', 'C', 'G', 'T']:
             d[nt] = ttk.Label(self.seq_info2, width=10)#, fg=self.colorsNT[nt])
-            d[nt].pack(side=LEFT, fill=BOTH, expand=1)
+            d[nt].pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
     def create_buttons(self, parent):
         self.button_frame = ttk.Frame(parent)
-        self.button_frame.pack(fill=Y, side=LEFT)
+        self.button_frame.pack(fill=tk.Y, side=tk.LEFT)
         self.buttons = {}
         for text, func in [('Open', self.open),
                            ('Export', self.export),
@@ -236,24 +238,24 @@ class xbb_widget(object):
                            ('Exit', self.exit)]:
             b_id = ttk.Button(self.button_frame, text=text,
                               command=func, width=7)
-            b_id.pack(side=TOP, pady=5, padx=10)
+            b_id.pack(side=tk.TOP, pady=5, padx=10)
             self.buttons[text] = b_id
 
         f = ttk.Frame(self.button_frame)
         l = ttk.Label(f, text='Goto:') #, bg=self.colorsbg['frame'],
                       #fg=self.colorsfg['button'])
-        l.pack(side=LEFT)
+        l.pack(side=tk.LEFT)
         l.bind('<Button-1>', self.goto)
 
         self.goto_entry = ttk.Entry(f, width=5)
-        self.goto_entry.pack(side=RIGHT, pady=5, padx=4)
+        self.goto_entry.pack(side=tk.RIGHT, pady=5, padx=4)
         self.goto_entry.bind('<Return>', self.goto)
-        f.pack(side=BOTTOM)
+        f.pack(side=tk.BOTTOM)
 
     def create_seqfield(self, parent):
         self.sequence_id = tk.Text(parent, wrap='char',
                                 width=self.seqwidth)
-        self.sequence_id.pack(fill=BOTH, expand=1, side=RIGHT)
+        self.sequence_id.pack(fill=tk.BOTH, expand=1, side=tk.RIGHT)
 
     def create_bindings(self):
         self.sequence_id.bind('<Motion>', self.position)
@@ -269,7 +271,7 @@ class xbb_widget(object):
             self.position_ids[i].configure(text='')
 
     def get_length(self):
-        self.sequence_length = len(self.sequence_id.get(1.0, END))
+        self.sequence_length = len(self.sequence_id.get(1.0, tk.END))
         return self.sequence_length
 
     def select_all(self, event):
@@ -286,29 +288,25 @@ class xbb_widget(object):
         w = self.sequence_id
         seq = self.get_selection()
         if not len(seq):
-            seq = self.sequence_id.get(1.0, END)
+            seq = self.sequence_id.get(1.0, tk.END)
 
         seq = re.sub('[^A-Z]', '', seq)
-        return seq
+        return str(seq)
 
     def get_selection(self):
         w = self.sequence_id
         # print(w.selection_own())
         # w.selection_own()
         try:
-            return str(w.selection_get())
-            # return string.upper(w.get(sel.first, sel.last))
-        except Exception:  # TODO - Which exceptions?
+            return w.selection_get()
+        except tk.TclError:  # Nothing is selected
             return ''
 
     def get_self_selection(self):
         w = self.sequence_id
-        # w.selection_own()
         try:
             return w.selection_get()
-            # return string.upper(w.get(sel.first, sel.last))
-            # return string.upper(w.selection_own_get())
-        except Exception:  # TODO - Which exceptions?
+        except tk.TclError:  # Nothing is selected
             return ''
 
     def count_selection(self, event):
@@ -348,17 +346,17 @@ class xbb_widget(object):
 
     def insert_sequence(self, name_sequence):
         (name, sequence) = name_sequence
-        self.sequence_id.delete(0.0, END)
-        self.sequence_id.insert(END, sequence.upper())
+        self.sequence_id.delete(0.0, tk.END)
+        self.sequence_id.insert(tk.END, sequence.upper())
         self.fix_sequence()
         self.update_label(name)
 
     def fix_sequence(self):
-        seq = str(self.sequence_id.get(1.0, END))
+        seq = str(self.sequence_id.get(1.0, tk.END))
         seq = seq.upper()
         seq = re.sub('[^A-Z]', '', seq)
-        self.sequence_id.delete(0.0, END)
-        self.sequence_id.insert(END, seq)
+        self.sequence_id.delete(0.0, tk.END)
+        self.sequence_id.insert(tk.END, seq)
 
     def update_label(self, header):
         name = header.split(' ')[0]
@@ -375,8 +373,8 @@ class xbb_widget(object):
             return
         np = NotePad()
         tid = np.text_id()
-        tid.insert(END, self.translator.gcframe(seq,
-                                                self.current_codon_table_id))
+        tid.insert(tk.END,
+                   self.translator.gcframe(seq, self.current_codon_table_id))
 
     def translate(self, frame=1):
         seq = self.get_selection_or_sequence()
@@ -384,7 +382,7 @@ class xbb_widget(object):
             return
         np = NotePad()
         tid = np.text_id()
-        tid.insert(END,
+        tid.insert(tk.END,
                    self.translator.frame_nice(seq, frame,
                                               self.current_codon_table_id))
 
@@ -397,7 +395,7 @@ class xbb_widget(object):
         aa_seq = re.sub('(.{50})', '\\1\n', str(aa_seq))
         np = NotePad()
         tid = np.text_id()
-        tid.insert(END, '>frame%d\n%s' % (frame, aa_seq))
+        tid.insert(tk.END, '>frame%d\n%s' % (frame, aa_seq))
 
     def statistics(self):
         seq = self.get_selection_or_sequence()
@@ -415,7 +413,7 @@ class xbb_widget(object):
         np = NotePad()
         tid = np.text_id()
 
-        tid.insert(END, "%s\n\n" %
+        tid.insert(tk.END, "%s\n\n" %
                    (time.strftime('%y %b %d, %X\n',
                                   time.localtime(time.time()))) + 
                    "Length = %d\nA=%d C=%d G=%d T=%d other=%d\nGC=%f\n\n" %
@@ -429,9 +427,9 @@ class xbb_widget(object):
         w = self.sequence_id
         w.selection_own()
         try:
-            start, stop = w.tag_ranges(SEL)
-        except Exception:  # TODO - Which exceptions?
-            start, stop = 1.0, self.sequence_id.index(END)
+            start, stop = w.tag_ranges(tk.SEL)
+        except ValueError:  # Nothing selected
+            start, stop = 1.0, self.sequence_id.index(tk.END)
 
         seq = w.get(start, stop)
         seq = list(re.sub('[^A-Z]', '', seq))
@@ -440,17 +438,17 @@ class xbb_widget(object):
 
         w.delete(start, stop)
         w.insert(start, seq)
-        w.tag_remove(SEL, 1.0, start)
-        w.tag_add(SEL, start, stop)
-        w.tag_remove(SEL, stop, END)
+        w.tag_remove(tk.SEL, 1.0, start)
+        w.tag_add(tk.SEL, start, stop)
+        w.tag_remove(tk.SEL, stop, tk.END)
 
     def complement(self):
         w = self.sequence_id
         w.selection_own()
         try:
-            start, stop = w.tag_ranges(SEL)
-        except Exception:  # Which exceptions?
-            start, stop = 1.0, self.sequence_id.index(END)
+            start, stop = w.tag_ranges(tk.SEL)
+        except ValueError:  # Nothing selected
+            start, stop = 1.0, self.sequence_id.index(tk.END)
 
         seq = str(w.get(start, stop))
         
@@ -461,17 +459,17 @@ class xbb_widget(object):
         complementary = self.translator.complement(seq)
         w.delete(start, stop)
         w.insert(start, complementary)
-        w.tag_remove(SEL, 1.0, start)
-        w.tag_add(SEL, start, stop)
-        w.tag_remove(SEL, stop, END)
+        w.tag_remove(tk.SEL, 1.0, start)
+        w.tag_add(tk.SEL, start, stop)
+        w.tag_remove(tk.SEL, stop, tk.END)
 
     def antiparallel(self):
         w = self.sequence_id
         w.selection_own()
         try:
-            start, stop = w.tag_ranges(SEL)
+            start, stop = w.tag_ranges(tk.SEL)
         except Exception:  # TODO - Which exceptions?
-            start, stop = 1.0, self.sequence_id.index(END)
+            start, stop = 1.0, self.sequence_id.index(tk.END)
 
         seq = str(w.get(start, stop))
         seq = re.sub('[^A-Z]', '', seq)
@@ -479,9 +477,9 @@ class xbb_widget(object):
         antip = self.translator.antiparallel(seq)
         w.delete(start, stop)
         w.insert(start, antip)
-        w.tag_remove(SEL, 1.0, start)
-        w.tag_add(SEL, start, stop)
-        w.tag_remove(SEL, stop, END)
+        w.tag_remove(tk.SEL, 1.0, start)
+        w.tag_add(tk.SEL, start, stop)
+        w.tag_remove(tk.SEL, stop, tk.END)
 
     def search(self):
         seq = self.get_selection_or_sequence()
@@ -502,7 +500,7 @@ class xbb_widget(object):
                 import traceback
                 traceback.print_exc()
 
-                self.goto_entry.delete(0, END)
+                self.goto_entry.delete(0, tk.END)
                 return
 
         self.sequence_id.focus()
@@ -511,7 +509,7 @@ class xbb_widget(object):
     def mark(self, start, stop):
         self.sequence_id.focus()
         self.sequence_id.mark_set('insert', '1.%d' % start)
-        self.sequence_id.tag_add(SEL, '1.%d' % start, '1.%d' % stop)
+        self.sequence_id.tag_add(tk.SEL, '1.%d' % start, '1.%d' % stop)
 
 if __name__ == '__main__':
     xbbtools = xbb_widget()

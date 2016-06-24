@@ -26,7 +26,7 @@ xbbtools.main_frame.option_add('*frame.background', 'dimgrey')
 
 try:
     xbbtools.open(sys.argv[1])
-except Exception:  # TODO - Which exceptions?
+except IndexError:  # Started script without specifying a filename
     pass
 
 win.mainloop()
